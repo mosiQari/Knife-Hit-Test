@@ -1,0 +1,46 @@
+
+[
+	{
+		"__Type": "JoinToRoomReq",
+		"RoomID": 1,
+		"PlayerID": 1
+	}
+	,
+
+	{
+		"__Type": "GameStateUpdateReq",
+		"Ships": ["2,5,10|3,6,52|65,54,5"],
+		"Board":[],
+		"TouchedCell": 0,
+		"Turn": 1
+	}
+	
+	,
+	
+	{
+		"__Type": "GameStateUpdateReq",
+		"Ships": [
+			"2,5,10|3,6,52|65,54,5", 
+			"20,50,10|30,60,52|65,54,5"
+		],
+		"Board":[
+			"21,2,10,54,32", 
+			"21,58,26,14,54"
+		],
+		"TouchedCell": 21,
+		"Turn": 1
+	}
+	
+	,
+
+	{
+		"__Type": "PlayerBackReq",
+		"RoomID": 1,
+		"PlayerID": 1
+	}
+	,
+
+	{
+		"__Type": "ResignReq"
+	}
+]

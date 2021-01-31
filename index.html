@@ -1,0 +1,68 @@
+<!doctype html>
+<style>
+	textarea {
+		vertical-align: bottom;
+	}
+
+	#output {
+		overflow: auto;
+	}
+
+		#output > p {
+			overflow-wrap: break-word;
+		}
+
+		#output span {
+			color: blue;
+		}
+
+			#output span.error {
+				color: red;
+			}
+</style>
+<h2>WebSocket Test</h2>
+<textarea cols=60 rows=6></textarea>
+<button>send</button>
+<div id=output></div>
+<script>
+	var button = document.querySelector("button"),
+		output = document.querySelector("#output"),
+		textarea = document.querySelector("textarea"),
+		wsUri = "ws://195.248.242.231:8070",
+		websocket = new WebSocket(wsUri);
+
+	button.addEventListener("click", onClickButton);
+
+	websocket.onopen = function (e) {
+		writeToScreen("Connected");
+	};
+
+	websocket.onclose = function (e) {
+		writeToScreen("Disconnected");
+	};
+
+	websocket.onmessage = function (e) {
+		writeToScreen("<span>Received: " + e.data + "</span>");
+	};
+
+	websocket.onerror = function (e) {
+		writeToScreen("<span class=error>Error:</span> " + e.data);
+	};
+
+	function doSend(message) {
+		writeToScreen("Sent: " + message);
+		websocket.send(message);
+	}
+
+	function writeToScreen(message) {
+		output.insertAdjacentHTML("afterbegin", "<p>" + message + "</p>");
+	}
+
+	function onClickButton() {
+		var text = textarea.value;
+
+		text && doSend(text);
+		textarea.value = "";
+		textarea.focus();
+	}
+</script>

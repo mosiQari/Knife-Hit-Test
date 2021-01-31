@@ -1,0 +1,30 @@
+<html>
+<body>
+
+<script>
+
+    function MyClass() {
+    }
+
+    MyClass.prototype.setTimer = function(msg) {
+        let myClass = this;
+
+        function timerRelay() {
+            myClass.handleTimer(msg);
+        }
+
+        alert("Starting timer");
+        setTimeout(timerRelay, 1000);
+    };
+
+    MyClass.prototype.handleTimer = function(msg) {
+        alert(msg);
+    };
+
+    let c = new MyClass();
+    c.setTimer("Hello");
+
+</script>
+</body>
+
+</html>
