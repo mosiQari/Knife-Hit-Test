@@ -378,7 +378,6 @@ function updateRoomData(room, player, data) {//Updating room data with latest da
     if (room) {
 
         room.data.GameState[player.num - 1] = {Level: data}
-
         return true
 
     }
