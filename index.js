@@ -325,7 +325,6 @@ function startTimer(room) {//After timeout gives winner of the room
     timer = setTimeout(function () {
 
         let winner = selectWinner(room)
-        console.log(winner)
 
         if (winner) {//If one of players wins
 
