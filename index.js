@@ -1,5 +1,5 @@
-let WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({ port: 8070 })
+let WebSocketServer = require('ws').Server
+let wss = new WebSocketServer({ port: 8070 })
 let PLAYERS = []
 let ROOMS = []
 let CAPACITY = 2
@@ -120,7 +120,7 @@ wss.on('connection', function (ws, request, client) {
 
                 let room = new Room(msg.RoomID, CAPACITY, {
                     "__Type": "PlayerBackRes",
-                    "GameState": [{Level: 1}, {Level: 1}]
+                    "GameState": [{ Level: 1 }, { Level: 1 }]
                 })
 
                 ROOMS.push(room)
@@ -155,13 +155,13 @@ wss.on('connection', function (ws, request, client) {
 
                 let room = ROOMS.find(e => e.id === player.roomId)
                 if (room) {
-                    
+
                     player.level = msg.Level
                     player.hits = msg.Hits
-                    
+
                     sendGameStateUpdateRes(player.level, player.hits, msg.AddKnife, room.players, player)
                     updateRoomData(room, player, player.level)
-                
+
                 }
             }
 
@@ -318,38 +318,40 @@ function print(message) {
 
 }
 
-function nextTurn(players, turn) {
-
-    let presentPlayers = []
-
-    players.forEach(function (player, i) {
-        if (!player.deleted) {
-            presentPlayers[i] = player.num
-        }
-    })
-
-    let index = presentPlayers.indexOf(turn)
-
-    if (index >= presentPlayers.length - 1)
-        index = 0
-    else
-        index++
-
-    return presentPlayers[index]
-
-}
-
-function startTimer(room) {
+function startTimer(room) {//After timeout gives winner of the room
 
     clearTimeout(timer)
 
     timer = setTimeout(function () {
 
-        room.players.forEach(function (player) {
+        let winner = selectWinner(room)
+        console.log(winner)
 
-            //send <EndGameUpdate> 
+        if (winner) {//If one of players wins
 
-        })
+            room.players.forEach(function (player) {
+                player.ws.send(JSON.stringify({
+                    __Type: "EndGameRes",
+                    PlayerNumber: winner.num,
+                    Level: winner.level,
+                    Hits: winner.hits
+                }))
+
+            })
+
+        } else {//If draw
+
+            room.players.forEach(function (player) {
+                player.ws.send(JSON.stringify({
+                    __Type: "EndGameRes",
+                    PlayerNumber: -1,
+                    Level: player.level,
+                    Hits: player.hits
+                }))
+
+            })
+
+        }
 
     }, timeout)
 
@@ -377,11 +379,47 @@ function updateRoomData(room, player, data) {//Updating room data with latest da
 
     if (room) {
 
-        room.data.GameState[player.num - 1] = {Level: data}
+        room.data.GameState[player.num - 1] = { Level: data }
         return true
 
     }
 
     return false
+
+}
+
+function selectWinner(room) {
+
+    let winner = null
+    room.players.forEach(function (player) {
+
+        if (winner != null) {
+
+            if (player.level === winner.level) {//Equal levels
+
+                if (player.hits === winner.hits) {//Equal hits
+
+                    winner = 0
+
+                } else if (player.hits > winner.hits) {//Bigger hits
+
+                    winner = player
+                }
+
+            } else if (player.level > winner.level) {//Bigger level
+
+                winner = player
+
+            }
+
+        } else {//First loop round
+
+            winner = player
+
+        }
+
+    })
+    
+    return winner
 
 }
